@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import Swal from 'sweetalert2';
 import { Card } from './card';
 
 interface User {
@@ -58,8 +59,14 @@ export default function UserList() {
       fetchUsers();
       setShowForm(false);
       reset();
+      Swal.fire('Sucesso!', 'Usuário adicionado com sucesso.', 'success');
     } catch (error) {
-      console.error('Erro ao adicionar usuário:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 409) {
+            Swal.fire('Erro!', 'Esse email já está em uso.', 'error');
+          } else {
+            console.error('Erro ao adicionar usuário:', error);
+            Swal.fire('Erro!', 'Não foi possível adicionar o usuário.', 'error');
+          }
     }
   };
 

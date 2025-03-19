@@ -34,7 +34,7 @@ export function Card({ id, nome, idade, email, onUpdate }: UserType) {
       try {
         await axios.delete(`https://list-user-api.onrender.com/users/${id}`);
         Swal.fire('Deletado!', 'O usuário foi deletado com sucesso.', 'success');
-        onUpdate(); // Atualizar a lista de usuários
+        onUpdate();
       } catch (error) {
         console.error('Erro ao deletar usuário:', error);
         Swal.fire('Erro!', 'Não foi possível deletar o usuário.', 'error');
@@ -50,12 +50,16 @@ export function Card({ id, nome, idade, email, onUpdate }: UserType) {
         email: editedEmail,
       };
       await axios.put(`https://list-user-api.onrender.com/users/${id}`, updatedUser);
-      setIsEditing(false); // Sair do modo de edição
+      setIsEditing(false);
       Swal.fire('Sucesso!', 'Usuário atualizado com sucesso.', 'success');
-      onUpdate(); // Atualizar a lista de usuários
+      onUpdate();
     } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
-      Swal.fire('Erro!', 'Não foi possível atualizar o usuário.', 'error');
+        if (axios.isAxiosError(error) && error.response?.status === 409) {
+            Swal.fire('Erro!', 'Esse email já está em uso.', 'error');
+          } else {
+            console.error('Erro ao atualizar usuário:', error);
+            Swal.fire('Erro!', 'Não foi possível atualizar o usuário.', 'error');
+          }
     }
   };
 
